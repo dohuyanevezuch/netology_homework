@@ -50,15 +50,24 @@ if [ "$username" != "root" ]; then
 fi
 
 # Проверка задан ли префикс и интерфейс (не тронуто с задания)
-[[ "$PREFIX" = "NOT_SET" ]] && { echo "\$PREFIX must be passed as first positional argument"; exit 1; }
 if [[ -z "$INTERFACE" ]]; then
-    echo "\$INTERFACE must be passed as second positional argument"
+    echo "\$INTERFACE must be passed as first positional argument"
     exit 1
 fi
 
+
+# Проверка Префикса
+IFS='.' read -ra prefixcut <<< "$PREFIX"
+if [[ "$PREFIX" = "NOT_SET" ]] || [[ ! "${#prefixcut[@]}" -eq 2 ]]; then
+        echo "\$PREFIX is incorrect or empty, please enter the text in the format xxx.xxx"
+        exit 1
+fi
+
 # Запуск функций
-check_arg "$SUBNET"
-check_arg "$HOST"
+for arg in "${prefixcut[0]}" "${prefixcut[1]}" "$SUBNET" "$HOST"
+do
+        check_arg "$arg"
+done
+
 
 arping_run "$PREFIX" "$SUBNET" "$HOST"
-
