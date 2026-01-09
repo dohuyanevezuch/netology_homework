@@ -1,0 +1,24 @@
+---
+- name: Install Apache
+  ansible.builtin.package:
+    name: "{{ apache_package }}"
+    state: present
+
+- name: Running and Enabled Apache service
+  service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: true
+
+- name: Allow 80 port 
+  ufw:
+    rule: allow
+    port: "{{ apache_port }}"
+    proto: tcp
+
+- name: Configure index.html
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    mode: '0644'
+  notify: Restart apache

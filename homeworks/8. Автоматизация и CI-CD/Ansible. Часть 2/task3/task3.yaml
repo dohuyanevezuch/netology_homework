@@ -1,0 +1,16 @@
+---
+- name: Install and Config Apache
+  hosts: learnservers
+  become: true
+  roles:
+    - apache
+
+- name: Check web
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Check uri 200 to hosts
+      uri:
+        url: "http://{{ hostvars[item].ansible_default_ipv4.address }}"
+        status_code: 200
+      loop: "{{ groups['learnservers'] }}"
